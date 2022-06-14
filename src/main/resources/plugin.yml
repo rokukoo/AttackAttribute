@@ -1,0 +1,8 @@
+name: AttackAttribute
+version: 1.0.0
+description: AttackAttribute
+author: Rokuko
+main: io.rokuko.attackattribute.AttackAttribute
+commands:
+  aa:
+    usage: /aa

@@ -1,0 +1,13 @@
+settings:
+  enable: true
+
+attributes:
+  attack-interval:
+    name: "攻击冷却"
+    unit: "tick"
+  attack-interval-reduction:
+    name: "攻击冷却缩减"
+    unit: "%"
+  attack-distance:
+    name: "攻击距离"
+    unit: "block"
