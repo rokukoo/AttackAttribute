@@ -10,9 +10,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Arrays;
-import java.util.function.Consumer;
-
 public class AttackAttribute extends JavaPlugin implements CommandExecutor {
 
     @Getter

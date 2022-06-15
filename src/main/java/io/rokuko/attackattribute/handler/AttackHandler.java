@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -86,18 +85,6 @@ public class AttackHandler implements Listener {
         }
 
         return attributeLores;
-    }
-
-    @EventHandler
-    public void onChange(PlayerItemHeldEvent event){
-        Player player = event.getPlayer();
-        ItemStack itemStack = player.getInventory().getItem(event.getNewSlot());
-        if (itemStack == null) return;
-
-        String attackDistanceAttributeLore = hasAttribute(itemStack, attackAttribute.config.attackDistanceName());
-        if (itemStack != null && !attackDistanceAttributeLore.isEmpty()){
-            Double attackDistance = attackDistanceAttributeLore.isEmpty()? 0 : StringUtils.extractDouble(attackDistanceAttributeLore);
-        }
     }
 
     private HashMap<UUidItemStackHolder, Long> lastAttackTimeHashMap = new HashMap<>();
