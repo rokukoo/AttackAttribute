@@ -27,7 +27,9 @@ public class AttackAttribute extends JavaPlugin implements CommandExecutor {
     public void onEnable() {
         saveDefaultConfig();
         config.refresh(this.getConfig());
-        Bukkit.getServer().getPluginManager().registerEvents(new AttackHandler(this), this);
+        AttackHandler attackHandler = new AttackHandler(this);
+        Bukkit.getServer().getPluginManager().registerEvents(attackHandler, this);
+        Bukkit.getServer().getPluginManager().registerEvents(attackHandler.new PostHandler(), this);
         Bukkit.getServer().getPluginCommand("aa").setExecutor(this);
         getLogger().info("AttackAttribute has been enabled!");
     }

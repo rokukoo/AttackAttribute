@@ -10,5 +10,8 @@ public class StringUtils {
         return Double.valueOf(clearColor(s).replaceAll("[^\\d.]", ""));
     }
 
+    public static String formatDouble(Double d){
+        return String.format("%.2f", d);
+    }
 
 }

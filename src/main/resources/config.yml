@@ -1,5 +1,7 @@
 settings:
   enable: true
+  pre-resolve: false
+  display: "cooldown"
 
 attributes:
   attack-interval:
@@ -11,3 +13,5 @@ attributes:
   attack-distance:
     name: "攻击距离"
     unit: "block"
+
+message:
