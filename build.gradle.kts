@@ -19,7 +19,9 @@ repositories {
 dependencies {
 
     // spigot-api
-    compileOnly("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT")
+//    compileOnly("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT")
+    compileOnly(files("lib\\paper-1.12.2-1618.jar"))
+    compileOnly(files("lib\\patched_1.12.2.jar"))
 
     // lombok
     compileOnly("org.projectlombok:lombok:1.18.8")

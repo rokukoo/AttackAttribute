@@ -9,13 +9,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.time.LocalTime;
 import java.util.*;
 
 public class AttackHandler implements Listener {
@@ -40,19 +36,15 @@ public class AttackHandler implements Listener {
             // Get the attribute lore from the item in main hand
             String attackIntervalAttributeLore = attributes.get(attackAttribute.config.attackIntervalName());
             String attackIntervalReductionAttributeLore = attributes.get(attackAttribute.config.attackIntervalReductionName());
-            String attackDistanceAttributeLore = attributes.get(attackAttribute.config.attackDistanceName());
 
             Double attackInterval = attackIntervalAttributeLore.isEmpty()? 0 : StringUtils.extractDouble(attackIntervalAttributeLore);
             Double attackIntervalReduction = attackIntervalReductionAttributeLore.isEmpty()? 0 : StringUtils.extractDouble(attackIntervalReductionAttributeLore);
-            Double attackDistance = attackDistanceAttributeLore.isEmpty()? 0 : StringUtils.extractDouble(attackDistanceAttributeLore);
-
 
             AttackAttributeEvent.PreAttack preAttackEvent = new AttackAttributeEvent.PreAttack(
                     player,
                     event.getEntity(),
                     attackInterval,
-                    attackIntervalReduction,
-                    attackDistance);
+                    attackIntervalReduction);
 
             Bukkit.getServer().getPluginManager().callEvent(preAttackEvent);
 
@@ -61,6 +53,15 @@ public class AttackHandler implements Listener {
                 return;
             }
         }
+    }
+
+    public String hasAttribute(ItemStack itemStack, String attributeName) {
+        if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasLore()) {
+            for (String lore : itemStack.getItemMeta().getLore()) {
+                if (lore.contains(attributeName)) return lore;
+            }
+        }
+        return "";
     }
 
     public HashMap<String, String> hasAttributes(ItemStack itemStack, String...attributeNames) {
@@ -88,17 +89,20 @@ public class AttackHandler implements Listener {
     }
 
     @EventHandler
-    public void onMove(PlayerInteractEvent event) {
-        ItemStack itemInHand = event.getPlayer().getItemInHand();
-        ItemMeta itemMeta = itemInHand.getItemMeta();
-        itemMeta.setLore(Arrays.asList("§f攻击冷却: 60", "§f攻击冷却缩减: 10%", "§f攻击距离: 10"));
-        itemInHand.setItemMeta(itemMeta);
+    public void onChange(PlayerItemHeldEvent event){
+        Player player = event.getPlayer();
+        ItemStack itemStack = player.getInventory().getItem(event.getNewSlot());
+        if (itemStack == null) return;
+
+        String attackDistanceAttributeLore = hasAttribute(itemStack, attackAttribute.config.attackDistanceName());
+        if (itemStack != null && !attackDistanceAttributeLore.isEmpty()){
+            Double attackDistance = attackDistanceAttributeLore.isEmpty()? 0 : StringUtils.extractDouble(attackDistanceAttributeLore);
+        }
     }
 
+    private HashMap<UUidItemStackHolder, Long> lastAttackTimeHashMap = new HashMap<>();
 
     public class PostHandler implements Listener{
-
-        private HashMap<UUID, Long> lastAttackTimeHashMap = new HashMap<>();
 
         @EventHandler
         public void onAttackAttributeEvent(AttackAttributeEvent.PreAttack event){
@@ -106,22 +110,23 @@ public class AttackHandler implements Listener {
             ItemStack itemInMainHand = player.getInventory().getItemInMainHand();
             double attackInterval = event.getAttackInterval();
             double attackIntervalReduction = event.getAttackIntervalReduction() / 100f;
-            double attackDistance = event.getAttackDistance();
-            if (lastAttackTimeHashMap.containsKey(player.getUniqueId())){
-                long lastAttackTime = this.lastAttackTimeHashMap.get(player.getUniqueId());
+            UUidItemStackHolder holder = UUidItemStackHolder.of(player.getUniqueId(), itemInMainHand);
+            if (lastAttackTimeHashMap.containsKey(holder)){
+                long lastAttackTime = AttackHandler.this.lastAttackTimeHashMap.get(holder);
+                System.out.println(lastAttackTime);
                 double tickInterval = (System.currentTimeMillis() - lastAttackTime) / 50f * (1 - attackIntervalReduction);
                 // If the player has not attacked in the last attackInterval, then he can attack
                 if (tickInterval < attackInterval){
                     event.setCancelled(true);
-                    player.sendMessage("§f攻击冷却: " + StringUtils.formatDouble(attackInterval - tickInterval));
+                    player.sendMessage("攻击冷却: " + StringUtils.formatDouble(attackInterval - tickInterval));
                     player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_NODAMAGE, 1, 1);
                 } else {
                     player.setCooldown(itemInMainHand.getType(), (int) attackInterval);
-                    lastAttackTimeHashMap.put(player.getUniqueId(), System.currentTimeMillis());
+                    lastAttackTimeHashMap.put(holder, System.currentTimeMillis());
                 }
             } else {
                 player.setCooldown(itemInMainHand.getType(), (int) attackInterval);
-                lastAttackTimeHashMap.put(player.getUniqueId(), System.currentTimeMillis());
+                lastAttackTimeHashMap.put(holder, System.currentTimeMillis());
             }
         }
 

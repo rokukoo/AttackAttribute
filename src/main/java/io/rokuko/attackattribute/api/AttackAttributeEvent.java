@@ -18,17 +18,14 @@ public class AttackAttributeEvent {
         private Entity entity;
         private double attackInterval;
         private double attackIntervalReduction;
-        private double attackDistance;
         private boolean cancelled;
 
-        public PreAttack(Player player, Entity entity, Double attackInterval, Double attackIntervalReduction, Double attackDistance) {
+        public PreAttack(Player player, Entity entity, Double attackInterval, Double attackIntervalReduction) {
             this.player = player;
             this.entity = entity;
             this.attackInterval = attackInterval;
             this.attackIntervalReduction = attackIntervalReduction;
-            this.attackDistance = attackDistance;
         }
-
 
         @Override
         public boolean isCancelled() {

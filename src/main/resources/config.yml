@@ -1,7 +1,7 @@
 settings:
   enable: true
   pre-resolve: false
-  display: "cooldown"
+  enable-cooldown-display: true
 
 attributes:
   attack-interval:
